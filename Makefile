@@ -8,6 +8,9 @@ setup:
 ingest:
 	. .venv/bin/activate; python scripts/ingest_trials.py
 
+inspect:
+	. .venv/bin/activate; python scripts/inspect_data.py
+
 # Run preprocessing pipeline
 preprocess:
 	. .venv/bin/activate; python src/pipelines/data_preprocessing.py
