@@ -1,0 +1,20 @@
+[project]
+name = "clinical-trial-outcome-predictor" 
+version = "0.1.0"
+description = "Predict clinical trial outcomes using ClinicalTrials.gov data."
+authors = [{ name = "Andrew Johnson" }]
+requires-python = ">=3.9"
+
+[project.dependencies]
+numpy = "*"
+pandas = "*"
+scikit-learn = "*"
+mlflow = "*"
+fastapi = "*"
+uvicorn = "*"
+pytest = "*"
+black = "*"
+flake8 = "*"
+requests = "*"
+pyyaml = "*"
+

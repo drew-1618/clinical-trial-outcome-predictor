@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
+.venv/
+env/
+venv/
+ENV/
+*.ipynb_checkpoints/
+
+# Data
+data/raw/
+data/interim/
+data/processed/
+mlflow/
+logs/
+*.csv
+*.json
+*.parquet
+
+# Environment files
+.env
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Docker
+*.pid
+docker/*.log
+
