@@ -11,6 +11,9 @@ ingest:
 inspect:
 	. .venv/bin/activate; python scripts/inspect_data.py
 
+transform:
+	. .venv/bin/activate; python scripts/transform_trials.py
+
 # Run preprocessing pipeline
 preprocess:
 	. .venv/bin/activate; python src/pipelines/data_preprocessing.py
