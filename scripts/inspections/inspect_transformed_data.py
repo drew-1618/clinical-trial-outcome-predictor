@@ -1,6 +1,6 @@
 """
 
-scripts/inspect_transformed_data.py
+scripts/inspections/inspect_transformed_data.py
 ----------------------------
 Script to inspect the transformed (flattened) clinical trial data.
 
