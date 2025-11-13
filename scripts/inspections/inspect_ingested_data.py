@@ -1,8 +1,9 @@
 """
 
-scripts/inspect_data.py
+scripts/inspections/inspect_data.py
 --------------------------
 Script to inspect the ingested clinical trial data.
+
 """
 
 import json
