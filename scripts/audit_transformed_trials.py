@@ -12,7 +12,7 @@ from pathlib import Path
 
 DATA_PATH = Path("data/processed/clinical_trials.csv")
 
-def audit_dataframe(df: pd.DataFrame) -> None:
+def audit_dataframe(df):
     print("\n=== DATA OVERVIEW ===")
     print(f"Rows: {len(df)}, Columns: {len(df.columns)}")
     print("Columns:", list(df.columns))

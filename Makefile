@@ -21,8 +21,14 @@ inspect_transformed:
 	. .venv/bin/activate; python scripts/inspections/inspect_transformed_data.py
 
 # Audit data quality
-audit:
-	. .venv/bin/activate; python scripts/audit_trials.py
+audit_transformed:
+	. .venv/bin/activate; python scripts/audit_transformed_trials.py
+audit_cleaned:
+	. .venv/bin/activate; python scripts/audit_cleaned_trials.py
+
+# Clean data
+clean_data:
+	.venv/bin/activate; python scripts/clean_data.py
 
 # Run preprocessing pipeline
 preprocess:
