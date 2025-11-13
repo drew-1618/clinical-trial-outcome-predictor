@@ -16,8 +16,13 @@ inspect_ingested:
 transform:
 	. .venv/bin/activate; python scripts/transform_trials.py
 
+# Inspect transformed data
 inspect_transformed:
 	. .venv/bin/activate; python scripts/inspections/inspect_transformed_data.py
+
+# Audit data quality
+audit:
+	. .venv/bin/activate; python scripts/audit_trials.py
 
 # Run preprocessing pipeline
 preprocess:
