@@ -8,11 +8,16 @@ setup:
 ingest:
 	. .venv/bin/activate; python scripts/ingest_trials.py
 
-inspect:
-	. .venv/bin/activate; python scripts/inspect_data.py
+# Inspect ingested data
+inspect_ingested:
+	. .venv/bin/activate; python scripts/inspections/inspect_ingested_data.py
 
+# Run data transformation
 transform:
 	. .venv/bin/activate; python scripts/transform_trials.py
+
+inspect_transformed:
+	. .venv/bin/activate; python scripts/inspections/inspect_transformed_data.py
 
 # Run preprocessing pipeline
 preprocess:
