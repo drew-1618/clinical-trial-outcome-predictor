@@ -10,6 +10,7 @@ based off scripts/audit_trials.py.
 import pandas as pd
 import numpy as np
 import os
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 def clean_phase_column(df):
     """Standardize the 'phase' column to consistent categories."""
@@ -93,6 +94,35 @@ def clean_sponsor_column(df, top_n=20):
 
     return df
 
+def clean_conditions_column(df, max_features=100):
+    """Applies TF-IDF Vectorization to the conditions column."""
+    print(f"Vectorizing 'conditions' using TF-IDF (top {max_features} features)...")
+
+    # Init vectorizer
+    tfidf = TfidfVectorizer(
+        stop_words='english',
+        lowercase=True,
+        max_features=max_features,
+        ngram_range=(1, 2)  # consider 1-word and 2-word phrases
+    )
+
+    # Fit and transform the 'conditions' text
+    conditions_matrix = tfidf.fit_transform(df['conditions']).toarray()
+
+    feature_names = [f'cond_{name}' for name in tfidf.get_feature_names_out()]
+    df_conditions = pd.DataFrame(conditions_matrix, columns=feature_names)
+
+    # Reset index of main df
+    df = df.reset_index(drop=True)
+
+    df = pd.concat([df, df_conditions], axis=1)
+
+    # Drop original conditions column
+    df = df.drop(columns=['conditions'])
+
+    return df
+
+
 def main(input_path, output_path):
     print(f"Loading data from {input_path}...")
     try:
@@ -110,6 +140,7 @@ def main(input_path, output_path):
 
     # Apply feature engineering
     df = clean_sponsor_column(df, top_n=20)
+    df = clean_conditions_column(df, max_features=100)
 
     # Save cleaned data
     print(f"Saving cleaned data to {output_path}...")
