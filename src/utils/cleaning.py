@@ -1,4 +1,4 @@
-# src/features/cleaning.py
+# src/utils/cleaning.py
 
 import pandas as pd
 import numpy as np
