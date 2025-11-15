@@ -6,37 +6,36 @@ setup:
 
 # Run data ingestion
 ingest:
-	. .venv/bin/activate; python scripts/ingest_trials.py
+	. .venv/bin/activate; python -m scripts.ingest_trials
 
-# Inspect ingested data
+# Inspect ingested raw data
 inspect_ingested:
-	. .venv/bin/activate; python scripts/inspections/inspect_ingested_data.py
+	. .venv/bin/activate; python -m scripts.inspections.inspect_raw_data
 
 # Run data transformation
 transform:
-	. .venv/bin/activate; python scripts/transform_trials.py
+	. .venv/bin/activate; python -m scripts.transform_trials
 
 # Inspect transformed data
 inspect_transformed:
-	. .venv/bin/activate; python scripts/inspections/inspect_transformed_data.py
+	. .venv/bin/activate; python -m scripts.inspections.inspect_transformed_data
 
 # Audit data quality
 audit_transformed:
-	. .venv/bin/activate; python scripts/audit_transformed_trials.py
+	. .venv/bin/activate; python -m scripts.inspections.audit_transformed_trials
 audit_cleaned:
-	. .venv/bin/activate; python scripts/audit_cleaned_trials.py
+	. .venv/bin/activate; python -m scripts.inspections.audit_cleaned_trials
 
-# Clean data
+# Clean/preprocess data
+.PHONY: clean_data preprocess
 clean_data:
-	. .venv/bin/activate; python scripts/clean_data.py
-
-# Run preprocessing pipeline
+	. .venv/bin/activate; python -m scripts.clean_data
 preprocess:
-	. .venv/bin/activate; python src/pipelines/data_preprocessing.py
+	. .venv/bin/activate; python -m scripts.clean_data
 
 # Run model training
 train:
-	. .venv/bin/activate; python src/pipelines/train_model.py
+	. .venv/bin/activate; python -m src.pipelines.train_model
 
 # Run tests
 test:

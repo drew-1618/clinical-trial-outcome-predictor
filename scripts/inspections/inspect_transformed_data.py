@@ -1,28 +1,11 @@
 """
-
-scripts/inspections/inspect_transformed_data.py
-----------------------------
-Script to inspect the transformed (flattened) clinical trial data.
-
+Entrypoint to inspect transformed data.
 """
 
-import pandas as pd
+from pathlib import Path
+from src.inspections.inspect_transformed_data import inspect_transformed_df
 
-df = pd.read_csv("data/processed/clinical_trials.csv")
+DATA_PATH = Path("data/processed/clinical_trials.csv")
 
-print(f"Loaded {len(df)} processed trials.")
-print("\n--- DataFrame Info ---")
-print(df.info())
-
-print("\n--- Sample Rows ---")
-print(df.head(5))
-
-# Quick sanity checks
-print("\n--- Missing Values Summary ---")
-print(df.isna().sum())
-
-print("\n--- Unique Phases ---")
-print(df['phase'].unique()[:10])
-
-print("\n--- Unique Statuses ---")
-print(df['status'].unique()[:10])
+if __name__ == "__main__":
+    inspect_transformed_df(DATA_PATH)

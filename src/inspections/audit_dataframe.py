@@ -1,18 +1,14 @@
-"""
-
-scripts/audit_trials.py
---------------------------
-Quick data quality audit for transformed clinical trial data.
-Reports missing values, basic distributions, and potential cleaning targets.
-
-"""
+# src/inspections/audit_dataframe
 
 import pandas as pd
 from pathlib import Path
 
-DATA_PATH = Path("data/processed/clinical_trials.csv")
+def audit_dataframe(path):
+    print(f"Loading {path} ...")
+    if not path.exists():
+        raise FileNotFoundError(f"Missing expected file: {path}")
+    df = pd.read_csv(path)
 
-def audit_dataframe(df):
     print("\n=== DATA OVERVIEW ===")
     print(f"Rows: {len(df)}, Columns: {len(df.columns)}")
     print("Columns:", list(df.columns))
@@ -57,14 +53,3 @@ def audit_dataframe(df):
             invalid = df[~df[date_col].astype(str).str.match(r"^\d{4}-\d{2}-\d{2}$", na=True)]
             if len(invalid):
                 print(f"\n{len(invalid)} records have invalid {date_col} formats.")
-
-def main():
-    if not DATA_PATH.exists():
-        raise FileNotFoundError(f"Missing expected file: {DATA_PATH}")
-
-    print(f"Loading {DATA_PATH} ...")
-    df = pd.read_csv(DATA_PATH)
-    audit_dataframe(df)
-
-if __name__ == "__main__":
-    main()
