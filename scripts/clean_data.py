@@ -70,6 +70,29 @@ def encode_target_status(df):
     return df
 
 
+def clean_sponsor_column(df, top_n=20):
+    """One-hot encodes the top N most frequent sponsors and groups the rest."""
+
+    # Identify top_n sponsors based on counts
+    top_sponsors = df['sponsor'].value_counts().head(top_n).index.tolist()
+
+    # Create new column identifying the top sponsors or other sponsor
+    def get_sponsor_group(sponsor):
+        return sponsor if sponsor in top_sponsors else 'OTHER_SPONSOR'
+
+    df['sponsor_group'] = df['sponsor'].apply(get_sponsor_group)
+
+    # One-hot encode sponsor groups, create column for each group
+    df_dummies = pd.get_dummies(df['sponsor_group'], prefix='sponsor', drop_first=False)
+
+    # Merge dummy columns back into main df
+    df = pd.concat([df, df_dummies], axis=1)
+
+    # Drop original sponsor columns and temp sponsor_group column
+    df = df.drop(columns=['sponsor', 'sponsor_group'])
+
+    return df
+
 def main(input_path, output_path):
     print(f"Loading data from {input_path}...")
     try:
@@ -84,6 +107,9 @@ def main(input_path, output_path):
     df = clean_phase_column(df)
     df = clean_enrollment_column(df)
     df = encode_target_status(df)
+
+    # Apply feature engineering
+    df = clean_sponsor_column(df, top_n=20)
 
     # Save cleaned data
     print(f"Saving cleaned data to {output_path}...")

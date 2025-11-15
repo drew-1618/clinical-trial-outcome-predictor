@@ -28,7 +28,7 @@ audit_cleaned:
 
 # Clean data
 clean_data:
-	.venv/bin/activate; python scripts/clean_data.py
+	. .venv/bin/activate; python scripts/clean_data.py
 
 # Run preprocessing pipeline
 preprocess:
