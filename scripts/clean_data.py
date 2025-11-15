@@ -142,6 +142,9 @@ def main(input_path, output_path):
     df = clean_sponsor_column(df, top_n=20)
     df = clean_conditions_column(df, max_features=100)
 
+    # Apply final cleaning
+    df = df.drop(columns=['nct_id', 'phase', 'enrollment'], errors='ignore')
+
     # Save cleaned data
     print(f"Saving cleaned data to {output_path}...")
     df.to_csv(output_path, index=False)
