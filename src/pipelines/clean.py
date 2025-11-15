@@ -6,7 +6,7 @@ import sys
 import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from src.features.cleaning import (
+from src.utils.cleaning import (
     clean_phase_column,
     clean_enrollment_column,
     encode_target_status,
