@@ -51,7 +51,7 @@ audit_processed:
 .PHONY: train
 
 train:
-	. .venv/bin/activate; python -m src.pipelines.train_model
+	. .venv/bin/activate; python -m scripts.run_training
 
 # =============================
 # Testing

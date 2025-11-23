@@ -1,6 +1,7 @@
 numpy
 pandas
 scikit-learn
+joblib
 mlflow
 fastapi
 uvicorn
@@ -9,4 +10,3 @@ black
 flake8
 requests
 pyyaml
-
