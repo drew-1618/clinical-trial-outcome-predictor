@@ -11,6 +11,51 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
+def get_feature_importance(pipeline, top_n=20):
+    """
+    Extracts and prints the top positive and negative coefficients from the model.
+    """
+    print(f"\n--- Feature Importance Analysis (Top {top_n}) ---")
+
+    # extract model & preprocessor
+    model = pipeline.named_steps['classifier']
+    preprocessor = pipeline.named_steps['preprocessor']
+
+    # get feature names from preprocessor
+    try:
+        feature_names = preprocessor.get_feature_names_out()
+    except AttributeError:
+        print("Warning: Unable to extract feature names from preprocessor.")
+        return
+
+    # get coefficients & flatten to 1D array
+    coefs = model.coef_[0]
+
+    # create dataframe for easy sorting
+    importance = pd.DataFrame({
+        'Feature' : feature_names,
+        'Coefficient' : coefs
+    })
+
+    # separate good and bad predictors
+    success_features = importance[importance['Coefficient'] > 0].copy()
+    failure_features = importance[importance['Coefficient'] < 0].copy()
+
+    # print top predictors for sucess
+    print("\nTop Predictors for SUCCESS:")
+    if not success_features.empty:
+        print(success_features.sort_values(by='Coefficient', ascending=False).head(top_n).to_string(index=False))
+    else:
+        print("   (No positive features found)")
+
+    # print top predictors for failure
+    print("\nTop Predictors for FAILURE:")
+    if not failure_features.empty:
+        print(failure_features.sort_values(by='Coefficient', ascending=True).head(top_n).to_string(index=False))
+    else:
+        print("   (No negative features found)")
+
+
 def run_training_pipeline(input_path: str, model_path: str):
     """
     Trains a Logistic Regression model and saves it
@@ -71,6 +116,9 @@ def run_training_pipeline(input_path: str, model_path: str):
 
     print(classification_report(y_test, y_pred))
     print(f"ROC-AUC Score: {roc_auc_score(y_test, y_proba):.4f}\n")
+
+    # analyze feature importance
+    get_feature_importance(model_pipeline, top_n=10)
 
     # save model
     os.makedirs(os.path.dirname(model_path), exist_ok=True)
