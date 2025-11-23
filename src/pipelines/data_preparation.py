@@ -6,6 +6,7 @@ import sys
 import os
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+from src.utils.config_loader import load_config
 from src.features.build_features import (
     clean_phase_column,
     clean_enrollment_column,
@@ -15,6 +16,8 @@ from src.features.build_features import (
 )
 
 def run_preparation_pipeline(input_path, output_path):
+    config = load_config('paths.yaml')
+
     print(f"Loading data from {input_path}...")
     if not os.path.exists(input_path):
         print(f"Error: Input file not found at {input_path}")
@@ -31,8 +34,8 @@ def run_preparation_pipeline(input_path, output_path):
     df = encode_target_status(df)
 
     # Apply feature engineering
-    df = build_sponsor_features(df, top_n=20)
-    df = build_conditions_feature(df, max_features=100)
+    df = build_sponsor_features(df, top_n=20, save_path=config['artifacts']['top_sponsors'])
+    df = build_conditions_feature(df, max_features=100, save_path=config['artifacts']['tfidf_vectorizer'])
 
     # Apply final cleaning
     drop_cols = ['nct_id', 'phase', 'enrollment']

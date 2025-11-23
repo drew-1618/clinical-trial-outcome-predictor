@@ -2,6 +2,8 @@
 
 import pandas as pd
 import numpy as np
+import os
+import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 def clean_phase_column(df):
@@ -60,11 +62,19 @@ def encode_target_status(df):
     return df
 
 
-def build_sponsor_features(df, top_n=20):
-    """One-hot encodes the top N most frequent sponsors and groups the rest."""
+def build_sponsor_features(df, top_n=20, save_path=None):
+    """
+    One-hot encodes the top N most frequent sponsors and groups the rest.
+    If save_path is provided, saves the list of top sponsors for API to use"""
 
     # Identify top_n sponsors based on counts
     top_sponsors = df['sponsor'].value_counts().head(top_n).index.tolist()
+
+    # save artifact
+    if save_path:
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        joblib.dump(top_sponsors, save_path)
+        print(f"   -> Saved top sponsors list to {save_path}")
 
     # Create new column identifying the top sponsors or other sponsor
     df['sponsor_group'] = df['sponsor'].apply(
@@ -80,8 +90,11 @@ def build_sponsor_features(df, top_n=20):
     df = df.drop(columns=['sponsor', 'sponsor_group'])
     return df
 
-def build_conditions_feature(df, max_features=100):
-    """Applies TF-IDF Vectorization to the conditions column."""
+def build_conditions_feature(df, max_features=100, save_path=None):
+    """
+    Applies TF-IDF Vectorization to the conditions column.
+    If save_path is provided, saves the fitted Vectorizer for the API to use.
+    """
     print(f"   -> Vectorizing 'conditions' using TF-IDF (top {max_features} features)...")
 
     # Init vectorizer
@@ -92,6 +105,13 @@ def build_conditions_feature(df, max_features=100):
 
     # Fit and transform the 'conditions' text
     matrix = tfidf.fit_transform(df['conditions'].fillna('')).toarray()
+
+    # save artifact
+    if save_path:
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        joblib.dump(tfidf, save_path)
+        print(f"   -> Saved TF-IDF vectorizer to {save_path}")
+
     feature_names = [f'cond_{name}' for name in tfidf.get_feature_names_out()]
 
     df_conditions = pd.DataFrame(matrix, columns=feature_names, index=df.index)

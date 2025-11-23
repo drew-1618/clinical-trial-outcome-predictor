@@ -7,3 +7,7 @@ data:
 
 models:
   logistic_baseline: "models/logistic_regression.pkl"
+
+artifacts:
+  tfidf_vectorizer: "models/tfidf_vectorizer.joblib"
+  top_sponsors: "models/top_sponsors.joblib"
