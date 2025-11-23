@@ -1,3 +1,4 @@
+# src/utils/ingestion.py
 """
 Ingestion utilities for pulling clinical trial metadata from ClinicalTrials.gov.
 """
@@ -6,11 +7,7 @@ import os
 import json
 import requests
 
-API_URL = "https://clinicaltrials.gov/api/v2/studies"
-DEFAULT_OUTPUT_PATH = "data/raw/clinical_trials.json"
-
-
-def fetch_trials(condition="cancer", page_size=100, max_pages=3):
+def fetch_trials(api_url, condition, page_size, max_pages):
     """Fetch paginated clinical trial data."""
     all_trials = []
     page_token = None
@@ -27,12 +24,16 @@ def fetch_trials(condition="cancer", page_size=100, max_pages=3):
             params["pageToken"] = page_token
 
         print(f"Fetching page {page} for condition '{condition}'...")
-        response = requests.get(API_URL, params=params)
-        response.raise_for_status()
-        data = response.json()
+        try:
+            response = requests.get(api_url, params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching data: {e}")
+            break
 
         studies = data.get("studies", [])
-        print(f" → Retrieved {len(studies)} studies.")
+        print(f"   -> Retrieved {len(studies)} studies.")
         all_trials.extend(studies)
 
         page_token = data.get("nextPageToken")
@@ -44,8 +45,12 @@ def fetch_trials(condition="cancer", page_size=100, max_pages=3):
     return all_trials
 
 
-def save_trials(trials, output_path=DEFAULT_OUTPUT_PATH):
+def save_trials(trials, output_path):
     """Save fetched trials to a JSON file."""
+    if not trials:
+        print("No trials to save.")
+        return
+
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     with open(output_path, "w", encoding="utf-8") as f:

@@ -1,0 +1,6 @@
+# configs/paths.yaml
+
+data:
+  raw: "data/raw/clinical_trials.json"            # original json file
+  interim: "data/interim/clinical_trials.csv"     # flattened csv
+  processed: "data/processed/cleaned_trials.csv"  # final, feature engineered csv

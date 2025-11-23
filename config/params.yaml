@@ -1,0 +1,7 @@
+# config/params.yaml
+
+ingestion:
+  api_url: "https://clinicaltrials.gov/api/v2/studies"
+  condition: "cancer"
+  page_size: 100
+  max_pages: 5
