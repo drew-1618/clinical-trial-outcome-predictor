@@ -4,6 +4,9 @@ import pandas as pd
 import joblib
 import os
 import sys
+import mlflow
+import mlflow.sklearn
+from mlflow.models import infer_signature
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, roc_auc_score
@@ -60,8 +63,10 @@ def run_training_pipeline(input_path: str, model_path: str):
     """
     Trains a Logistic Regression model and saves it
     """
-    print("Starting Model Training...")
+    print("Starting Model Training (with MLflow)...")
     print(f"Loading data from {input_path}...")
+
+    mlflow.set_experiment("clinical_trials_outcome")
 
     if not os.path.exists(input_path):
         print(f"CRITICAL: Input data file {input_path} does not exists.")
@@ -81,44 +86,95 @@ def run_training_pipeline(input_path: str, model_path: str):
     print(f"Features detected: {X.shape[1]}")
     print(f"Target distribution:\n{y.value_counts(normalize=True)}")
 
+    # silence MLflow warning
+    # logistic regression uses floats anyway
+    X = X.astype(float)
+
     # train/test split
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
-    # only need to scale 'enrollment_log'...everything else is already 0-1
-    numeric_features = ['enrollment_log']
-    # ensure column exists
-    numeric_features = [col for col in numeric_features if col in X.columns]
+    with mlflow.start_run():
+        params = {
+            "model_type": "LogisticRegression",
+            "class_weight": "balanced",
+            "solver": "liblinear",
+            "max_iter": 1000,
+            "test_size": 0.2
+        }
+        mlflow.log_params(params)
 
-    preprocessor = ColumnTransformer(
-        transformers=[
-            ('num', StandardScaler(), numeric_features)
-        ],
-        remainder='passthrough'  # don't touch other columns
-    )
 
-    # build model pipeline
-    model_pipeline = Pipeline(steps=[
-        ('preprocessor', preprocessor),
-        ('classifier', LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42))
-    ])
+        # only need to scale 'enrollment_log'...everything else is already 0-1
+        numeric_features = ['enrollment_log']
+        # ensure column exists
+        numeric_features = [col for col in numeric_features if col in X.columns]
 
-    print("Training the model...")
-    model_pipeline.fit(X_train, y_train)
-    print("Model training complete.\n")
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('num', StandardScaler(), numeric_features)
+            ],
+            remainder='passthrough'  # don't touch other columns
+        )
 
-    print("--- Evaluation on Test Set ---")
-    y_pred = model_pipeline.predict(X_test)
+        # build model pipeline
+        model_pipeline = Pipeline(steps=[
+            ('preprocessor', preprocessor),
+            ('classifier', LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42))
+        ])
 
-    # get % confidence
-    y_proba = model_pipeline.predict_proba(X_test)[:, 1]
+        print("Training the model...")
+        model_pipeline.fit(X_train, y_train)
+        print("Model training complete.\n")
 
-    print(classification_report(y_test, y_pred))
-    print(f"ROC-AUC Score: {roc_auc_score(y_test, y_proba):.4f}\n")
+        print("--- Evaluation on Test Set ---")
+        y_pred = model_pipeline.predict(X_test)
 
-    # analyze feature importance
-    get_feature_importance(model_pipeline, top_n=10)
+        # get % confidence
+        y_proba = model_pipeline.predict_proba(X_test)[:, 1]
+
+        # terminal report
+        print(classification_report(y_test, y_pred))
+        # analyze feature importance
+        get_feature_importance(model_pipeline, top_n=10)
+
+        roc = roc_auc_score(y_test, y_proba)
+        report = classification_report(y_test, y_pred, output_dict=True)
+
+        metrics = {
+            "roc_auc": roc,
+            "precision_class_1": report['1']['precision'],
+            "recall_class_1": report['1']['recall'],
+            "f1_class_1": report['1']['f1-score']
+        }
+        mlflow.log_metrics(metrics)
+        print(f"Logged Metrics: ROC-AUC={roc:.4f}\n")
+
+        input_example = X_train.iloc[:5]
+        signature = infer_signature(input_example, model_pipeline.predict(input_example))
+
+        # log model
+        mlflow.sklearn.log_model(
+            sk_model=model_pipeline,
+            name="model",
+            input_example=input_example,
+            signature=signature)
+
+        try:
+            model = model_pipeline.named_steps['classifier']
+            feature_names = model_pipeline.named_steps['preprocessor'].get_feature_names_out()
+            coeffs = model.coef_[0]
+            
+            imp_df = pd.DataFrame({'Feature': feature_names, 'Coefficient': coeffs})
+            imp_df = imp_df.sort_values(by='Coefficient', ascending=False)
+            
+            # Save to temp file then log it
+            imp_df.to_csv("feature_importance.csv", index=False)
+            mlflow.log_artifact("feature_importance.csv")
+            os.remove("feature_importance.csv")  # cleanup
+        except Exception as e:
+            print(f"Skipping feature importance logging: {e}")
 
     # save model
     os.makedirs(os.path.dirname(model_path), exist_ok=True)
