@@ -59,3 +59,27 @@ train:
 
 test:
 	. .venv/bin/activate; pytest -v
+
+# =============================
+# Run Docker and open
+# browser to FastAPI app
+# =============================
+docker-run:
+	@echo "🐳 Building and Starting Docker container..."
+	docker-compose -f docker/docker-compose.yml up -d --build
+	@echo "⏳ Waiting for API to launch..."
+	@sleep 5
+	@echo "🚀 Opening Browser..."
+	cmd.exe /C start http://localhost:8000/docs || echo "⚠️ Could not open browser automatically. Please click: http://localhost:8000/docs"
+	@echo "✅ API is running in the background."
+	@echo "   - To stop it: make docker-stop"
+	@echo "   - To see logs: make docker-logs"
+
+docker-stop:
+	@echo "🛑 Stopping Docker container..."
+	docker-compose -f docker/docker-compose.yml down
+	@echo "✅ Docker container stopped."
+
+docker-logs:
+	@echo "📜 Tailing Docker logs..."
+	docker-compose -f docker/docker-compose.yml logs -f

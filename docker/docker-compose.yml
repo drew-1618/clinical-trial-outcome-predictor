@@ -1,0 +1,13 @@
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: clinical_predictor
+    ports:
+      - "8000:8000"
+    volumes:
+      # map model directory for if you retrain locally it sees new model
+      - ../models:/app/models
+    environment:
+      - PYTHONBUFFERED=1
