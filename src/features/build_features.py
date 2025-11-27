@@ -14,7 +14,9 @@ def clean_phase_column(df):
     # Create binary column for each major phase
     major_phases = ['PHASE1', 'PHASE2', 'PHASE3', 'PHASE4']
     for phase in major_phases:
-        df[f'is_{phase.lower()}'] = df['phase'].apply(lambda x: 1 if phase in x else 0)
+        df[f'is_{phase.lower()}'] = df['phase'].apply(
+            lambda x: 1 if phase in str(x).upper().replace(" ", "") else 0
+        )
 
     df['is_phase_not_specified'] = df['phase'].apply(lambda x: 1 if x == 'NOT_SPECIFIED' else 0)
 
