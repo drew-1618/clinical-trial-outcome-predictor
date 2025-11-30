@@ -1,4 +1,21 @@
 # =============================
+# Master Commands
+# =============================
+.PHONY: all nuke
+
+# Run the entire pipeline from scratch: Ingest -> Transform -> Prepare -> Audit Processed -> Train -> Test
+all: ingest transform prepare audit_processed train test
+	@echo "✅ Full Pipeline Complete! Model is ready in models/"
+
+# Nuke all generated data to start fresh
+nuke:
+	rm -rf data/raw/*
+	rm -rf data/interim/*
+	rm -rf data/processed/*
+	rm -rf models/*
+	@echo "💥 Project reset. Run 'make all' to rebuild."
+
+# =============================
 # Set up & Environment
 # =============================
 .PHONY: setup clean lint format
@@ -22,7 +39,7 @@ format:
 # =============================
 # Data Pipeline
 # =============================
-.PHONY: ingest inspect_raw transform prepare
+.PHONY: ingest inspect_raw transform inspect_interim prepare audit_processed
 
 # Ingest: JSON -> raw CSV
 ingest:
@@ -56,6 +73,7 @@ train:
 # =============================
 # Testing
 # =============================
+.PHONY: test
 
 test:
 	. .venv/bin/activate; pytest -v
@@ -64,6 +82,8 @@ test:
 # Run Docker and open
 # browser to FastAPI app
 # =============================
+.PHONY: docker-run docker-stop docker-logs
+
 docker-run:
 	@echo "🐳 Building and Starting Docker container..."
 	docker-compose -f docker/docker-compose.yml up -d --build
