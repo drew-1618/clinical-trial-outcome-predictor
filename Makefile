@@ -18,7 +18,7 @@ nuke:
 # =============================
 # Set up & Environment
 # =============================
-.PHONY: setup clean lint format
+.PHONY: setup clean lint check-format format
 
 setup:
 	python -m venv .venv
@@ -32,6 +32,9 @@ clean:
 
 lint:
 	. .venv/bin/activate; flake8 src scripts
+
+check-format:
+	. .venv/bin/activate; black --check src scripts
 
 format:
 	. .venv/bin/activate; black src scripts

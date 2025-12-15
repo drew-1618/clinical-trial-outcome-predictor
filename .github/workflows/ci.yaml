@@ -1,0 +1,38 @@
+name: CI Pipeline
+
+# Trigger on push to main of PR
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+  pull_request:
+    branches:
+      - main
+      - feature/**
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@4
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: make setup
+
+      - name: Check Formatting
+        run: make check-format
+
+      - name: Lint Code
+        run: make lint
+
+      - name: Run Tests
+        run: make tests
