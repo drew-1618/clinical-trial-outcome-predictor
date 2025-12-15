@@ -136,7 +136,8 @@ Use these commands to manage the entire lifecycle in one step.
 | Command | Description |
 | :--- | :--- |
 | **`make all`** | **Build Everything:** Runs ingestion, transformation, preparation, auditing, training, and testing in the correct order. |
-| **`make nuke`** | **Reset Project:** Deletes all generated data (`data/raw`, `processed`, etc.) and models. Use with caution! |
+| **`make clean`** | **Soft Reset Project:** Finds and deletes Python cache files, pytest cache files, and MLFlow logs. |
+| **`make nuke`** | **Hard Reset Project:** Deletes all generated data (`data/raw`, `processed`, etc.) and models. Use with caution! |
 
 ---
 
