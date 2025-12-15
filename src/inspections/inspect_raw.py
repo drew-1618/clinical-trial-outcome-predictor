@@ -39,8 +39,8 @@ def inspect_raw_json(filename):
             first_record = trials[0]
             print(f"\n 3. Sample Record Keys: {list(first_record.keys())}")
             print(
-                f"\n 4. Sample Content (First 500 chars): "
-                "{json.dumps(first_record, indent=2)[:500]}"
+                "\n 4. Sample Content (First 500 chars): "
+                f"{json.dumps(first_record, indent=2)[:500]}"
                 "\n...[truncated]"
             )
         else:
