@@ -34,7 +34,7 @@ lint:
 	. .venv/bin/activate; flake8 src scripts
 
 check-format:
-	. .venv/bin/activate; black --check src scripts
+	. .venv/bin/activate; black --check --diff src scripts
 
 format:
 	. .venv/bin/activate; black src scripts

@@ -48,8 +48,7 @@ def inspect_raw_json(filename):
 
     except json.JSONDecodeError:
         print(
-            "Error: Failed to decode JSON."
-            "The file might be corrupt or incomplete."
+            "Error: Failed to decode JSON. The file might be corrupt or incomplete."
         )
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
