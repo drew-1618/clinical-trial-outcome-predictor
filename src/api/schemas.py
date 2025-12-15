@@ -2,6 +2,7 @@
 
 from pydantic import BaseModel, Field, ConfigDict
 
+
 class TrialPredictionsRequest(BaseModel):
     nct_id: str = Field(..., description="Trial ID")
     phase: str = Field(..., description="Trial Phase (e.g. 'Phase 3')")
@@ -16,7 +17,7 @@ class TrialPredictionsRequest(BaseModel):
                 "phase": "Phase 3",
                 "condition": "Non-small cell lung cancer",
                 "sponsor": "Pfizer",
-                "enrollment": 500
+                "enrollment": 500,
             }
         }
     )

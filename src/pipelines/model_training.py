@@ -14,15 +14,17 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
+
 def get_feature_importance(pipeline, top_n=20):
     """
-    Extracts and prints the top positive and negative coefficients from the model.
+    Extracts and prints the top positive and
+    negative coefficients from the model.
     """
     print(f"\n--- Feature Importance Analysis (Top {top_n}) ---")
 
     # extract model & preprocessor
-    model = pipeline.named_steps['classifier']
-    preprocessor = pipeline.named_steps['preprocessor']
+    model = pipeline.named_steps["classifier"]
+    preprocessor = pipeline.named_steps["preprocessor"]
 
     # get feature names from preprocessor
     try:
@@ -35,26 +37,31 @@ def get_feature_importance(pipeline, top_n=20):
     coefs = model.coef_[0]
 
     # create dataframe for easy sorting
-    importance = pd.DataFrame({
-        'Feature' : feature_names,
-        'Coefficient' : coefs
-    })
+    importance = pd.DataFrame({"Feature": feature_names, "Coefficient": coefs})
 
     # separate good and bad predictors
-    success_features = importance[importance['Coefficient'] > 0].copy()
-    failure_features = importance[importance['Coefficient'] < 0].copy()
+    success_features = importance[importance["Coefficient"] > 0].copy()
+    failure_features = importance[importance["Coefficient"] < 0].copy()
 
     # print top predictors for sucess
     print("\nTop Predictors for SUCCESS:")
     if not success_features.empty:
-        print(success_features.sort_values(by='Coefficient', ascending=False).head(top_n).to_string(index=False))
+        print(
+            success_features.sort_values(by="Coefficient", ascending=False)
+            .head(top_n)
+            .to_string(index=False)
+        )
     else:
         print("   (No positive features found)")
 
     # print top predictors for failure
     print("\nTop Predictors for FAILURE:")
     if not failure_features.empty:
-        print(failure_features.sort_values(by='Coefficient', ascending=True).head(top_n).to_string(index=False))
+        print(
+            failure_features.sort_values(by="Coefficient", ascending=True)
+            .head(top_n)
+            .to_string(index=False)
+        )
     else:
         print("   (No negative features found)")
 
@@ -71,7 +78,7 @@ def run_training_pipeline(input_path: str, model_path: str):
     if not os.path.exists(input_path):
         print(f"CRITICAL: Input data file {input_path} does not exists.")
         sys.exit(1)
-    
+
     df = pd.read_csv(input_path)
     print("Data loaded successfully.")
 
@@ -79,7 +86,7 @@ def run_training_pipeline(input_path: str, model_path: str):
     if target_col not in df.columns:
         print(f"CRITICAL: Target column '{target_col}' not found in data.")
         sys.exit(1)
-    
+
     X = df.drop(columns=[target_col])
     y = df[target_col]
 
@@ -101,28 +108,32 @@ def run_training_pipeline(input_path: str, model_path: str):
             "class_weight": "balanced",
             "solver": "liblinear",
             "max_iter": 1000,
-            "test_size": 0.2
+            "test_size": 0.2,
         }
         mlflow.log_params(params)
 
-
         # only need to scale 'enrollment_log'...everything else is already 0-1
-        numeric_features = ['enrollment_log']
+        numeric_features = ["enrollment_log"]
         # ensure column exists
         numeric_features = [col for col in numeric_features if col in X.columns]
 
         preprocessor = ColumnTransformer(
-            transformers=[
-                ('num', StandardScaler(), numeric_features)
-            ],
-            remainder='passthrough'  # don't touch other columns
+            transformers=[("num", StandardScaler(), numeric_features)],
+            remainder="passthrough",  # don't touch other columns
         )
 
         # build model pipeline
-        model_pipeline = Pipeline(steps=[
-            ('preprocessor', preprocessor),
-            ('classifier', LogisticRegression(class_weight='balanced', max_iter=1000, random_state=42))
-        ])
+        model_pipeline = Pipeline(
+            steps=[
+                ("preprocessor", preprocessor),
+                (
+                    "classifier",
+                    LogisticRegression(
+                        class_weight="balanced", max_iter=1000, random_state=42
+                    ),
+                ),
+            ]
+        )
 
         print("Training the model...")
         model_pipeline.fit(X_train, y_train)
@@ -144,31 +155,36 @@ def run_training_pipeline(input_path: str, model_path: str):
 
         metrics = {
             "roc_auc": roc,
-            "precision_class_1": report['1']['precision'],
-            "recall_class_1": report['1']['recall'],
-            "f1_class_1": report['1']['f1-score']
+            "precision_class_1": report["1"]["precision"],
+            "recall_class_1": report["1"]["recall"],
+            "f1_class_1": report["1"]["f1-score"],
         }
         mlflow.log_metrics(metrics)
         print(f"Logged Metrics: ROC-AUC={roc:.4f}\n")
 
         input_example = X_train.iloc[:5]
-        signature = infer_signature(input_example, model_pipeline.predict(input_example))
+        signature = infer_signature(
+            input_example, model_pipeline.predict(input_example)
+        )
 
         # log model
         mlflow.sklearn.log_model(
             sk_model=model_pipeline,
             name="model",
             input_example=input_example,
-            signature=signature)
+            signature=signature,
+        )
 
         try:
-            model = model_pipeline.named_steps['classifier']
-            feature_names = model_pipeline.named_steps['preprocessor'].get_feature_names_out()
+            model = model_pipeline.named_steps["classifier"]
+            feature_names = model_pipeline.named_steps[
+                "preprocessor"
+            ].get_feature_names_out()
             coeffs = model.coef_[0]
-            
-            imp_df = pd.DataFrame({'Feature': feature_names, 'Coefficient': coeffs})
-            imp_df = imp_df.sort_values(by='Coefficient', ascending=False)
-            
+
+            imp_df = pd.DataFrame({"Feature": feature_names, "Coefficient": coeffs})
+            imp_df = imp_df.sort_values(by="Coefficient", ascending=False)
+
             # Save to temp file then log it
             imp_df.to_csv("feature_importance.csv", index=False)
             mlflow.log_artifact("feature_importance.csv")

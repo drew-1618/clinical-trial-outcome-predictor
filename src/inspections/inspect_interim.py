@@ -2,7 +2,7 @@
 
 import pandas as pd
 import os
-import sys
+
 
 def inspect_interim_df(filepath):
     print(f"Inspecting interim data at {filepath} ...")
@@ -12,12 +12,12 @@ def inspect_interim_df(filepath):
     try:
         df = pd.read_csv(filepath)
         # basic dimensions
-        print(f"\n1. Data Overview:")
+        print("\n1. Data Overview:")
         print(f"   - Rows: {df.shape[0]}")
         print(f"   - Columns: {df.shape[1]}")
-    
+
         # dataframe info
-        print(f"\n2. Column Types:")
+        print("\n2. Column Types:")
         df.info(verbose=False, memory_usage="deep")
 
         # sample data
@@ -34,14 +34,14 @@ def inspect_interim_df(filepath):
             print("   (No missing values found)")
 
         # domain-specific checks
-        target_cols = ['phase', 'status', 'enrollment']
-        
+        target_cols = ["phase", "status", "enrollment"]
+
         for col in target_cols:
             if col in df.columns:
                 print(f"\n--- Column Analysis: '{col}' ---")
                 unique_vals = df[col].unique()
                 print(f"   Unique Count: {len(unique_vals)}")
-                print(f"   Sample Values: {unique_vals[:10]}") # Show first 10
+                print(f"   Sample Values: {unique_vals[:10]}")  # Show first 10
             else:
                 print(f"\nWarning: Expected column '{col}' not found.")
 

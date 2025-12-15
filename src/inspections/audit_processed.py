@@ -3,6 +3,7 @@
 import pandas as pd
 import os
 
+
 def audit_processed_data(filepath):
     print(f"Auditing processed data at {filepath} ...")
     if not os.path.exists(filepath):
@@ -22,12 +23,14 @@ def audit_processed_data(filepath):
     if PRIMARY_KEY in df.columns:
         if df[PRIMARY_KEY].duplicated().any():
             duplicate_count = df[PRIMARY_KEY].duplicated().sum()
-            print(f"\n--- CRITICAL WARNING: PRIMARY KEY DUPLICATES ---")
-            print(f"**{duplicate_count}** duplicate entries found for {PRIMARY_KEY}. This needs immediate cleaning.")
+            print("\n--- CRITICAL WARNING: PRIMARY KEY DUPLICATES ---")
+            print(
+                f"**{duplicate_count}** duplicate entries found for "
+                "{PRIMARY_KEY}. This needs immediate cleaning."
+            )
         else:
-            print(f"\n--- PRIMARY KEY CHECK ---")
+            print("\n--- PRIMARY KEY CHECK ---")
             print(f"'{PRIMARY_KEY}' is unique across all {len(df)} records.")
-
 
     print("\n--- SAMPLE RECORDS ---")
     print(df.head())
@@ -50,6 +53,8 @@ def audit_processed_data(filepath):
     # Date sanity check
     for date_col in ["StartDate", "CompletionDate", "LastUpdatePostDate"]:
         if date_col in df.columns:
-            invalid = df[~df[date_col].astype(str).str.match(r"^\d{4}-\d{2}-\d{2}$", na=True)]
+            invalid = df[
+                ~df[date_col].astype(str).str.match(r"^\d{4}-\d{2}-\d{2}$", na=True)
+            ]
             if len(invalid):
-                print(f"\n{len(invalid)} records have invalid {date_col} formats.")
+                print(f"\n{len(invalid)} records have invalid" "{date_col} formats.")

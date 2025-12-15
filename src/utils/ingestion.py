@@ -1,11 +1,13 @@
 # src/utils/ingestion.py
 """
-Ingestion utilities for pulling clinical trial metadata from ClinicalTrials.gov.
+Ingestion utilities for pulling clinical trial metadata
+from ClinicalTrials.gov.
 """
 
 import os
 import json
 import requests
+
 
 def fetch_trials(api_url, condition, page_size, max_pages):
     """Fetch paginated clinical trial data."""

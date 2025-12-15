@@ -2,7 +2,7 @@
 
 import json
 import os
-import sys
+
 
 def inspect_raw_json(filename):
     print(f"Inspecting raw data at: {filename}...")
@@ -21,11 +21,14 @@ def inspect_raw_json(filename):
         if isinstance(data, list):
             trials = data
             structure_type = "List of Studies"
-        elif isinstance(data, dict) and 'studies' in data:
-            trials = data['studies']
+        elif isinstance(data, dict) and "studies" in data:
+            trials = data["studies"]
             structure_type = "Dict with 'studies' key"
         else:
-            print("Warning: JSON structure not recognized (expected list or dict with 'studies').")
+            print(
+                "Warning: JSON structure not recognized "
+                "(expected list or dict with 'studies')."
+            )
             return
 
         # basic stats
@@ -35,11 +38,17 @@ def inspect_raw_json(filename):
         if trials:
             first_record = trials[0]
             print(f"\n 3. Sample Record Keys: {list(first_record.keys())}")
-            print(f"\n 4. Sample Content (First 500 chars): {json.dumps(first_record, indent=2)[:500]}\n...[truncated]")
+            print(
+                f"\n 4. Sample Content (First 500 chars): \
+                    {json.dumps(first_record, indent=2)[:500]}\
+                    \n...[truncated]"
+            )
         else:
             print("\n3. Warning: Trials list is empty.")
 
     except json.JSONDecodeError:
-        print("Error: Failed to decode JSON. The file might be corrupt or incomplete.")
+        print(
+            "Error: Failed to decode JSON." "The file might be corrupt or incomplete."
+        )
     except Exception as e:
         print(f"An unexpected error occurred: {e}")

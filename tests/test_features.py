@@ -2,7 +2,12 @@
 
 import pandas as pd
 import numpy as np
-from src.features.build_features import *
+from src.features.build_features import (
+    clean_phase_column,
+    clean_enrollment_column,
+    encode_target_status,
+    build_sponsor_features
+)
 
 def test_enrollment_log_trasform():
     """Check that enrollment is correctly log-transformed and handles NaNs"""

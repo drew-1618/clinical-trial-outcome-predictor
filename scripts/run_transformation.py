@@ -7,15 +7,15 @@ import sys
 import os
 
 # Add project root to python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from src.utils.config_loader import load_config
-from src.pipelines.data_transformation import run_transformation_pipeline
+from src.utils.config_loader import load_config  # noqa: E402
+from src.pipelines.data_transformation import run_transformation_pipeline  # noqa: E402
 
 if __name__ == "__main__":
-    config = load_config('paths.yaml')
+    config = load_config("paths.yaml")
 
-    input_file = config['data']['raw']
-    output_file = config['data']['interim']
+    input_file = config["data"]["raw"]
+    output_file = config["data"]["interim"]
 
     run_transformation_pipeline(input_file, output_file)
