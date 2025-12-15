@@ -39,16 +39,17 @@ def inspect_raw_json(filename):
             first_record = trials[0]
             print(f"\n 3. Sample Record Keys: {list(first_record.keys())}")
             print(
-                f"\n 4. Sample Content (First 500 chars): \
-                    {json.dumps(first_record, indent=2)[:500]}\
-                    \n...[truncated]"
+                f"\n 4. Sample Content (First 500 chars): "
+                "{json.dumps(first_record, indent=2)[:500]}"
+                "\n...[truncated]"
             )
         else:
             print("\n3. Warning: Trials list is empty.")
 
     except json.JSONDecodeError:
         print(
-            "Error: Failed to decode JSON." "The file might be corrupt or incomplete."
+            "Error: Failed to decode JSON."
+            "The file might be corrupt or incomplete."
         )
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
