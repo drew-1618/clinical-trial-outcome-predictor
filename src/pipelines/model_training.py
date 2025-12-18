@@ -42,7 +42,7 @@ def get_feature_importance(pipeline, top_n=20):
         return
 
     # Logistic Regression
-    if hasattr(model, "coeff_"):
+    if hasattr(model, "coef_"):
         # get coefficients & flatten to 1D array
         coefs = model.coef_[0]
 
@@ -103,6 +103,8 @@ def run_training_pipeline(input_path: str, model_path: str):
     print(f"Selected model: {model_type.upper()}")
     print(f"Loading data from {input_path}...")
 
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
+
     mlflow.set_experiment("clinical_trials_outcome")
 
     if not os.path.exists(input_path):
@@ -123,10 +125,6 @@ def run_training_pipeline(input_path: str, model_path: str):
     print(f"Features detected: {X.shape[1]}")
     print(f"Target distribution:\n{y.value_counts(normalize=True)}")
 
-    # silence MLflow warning
-    # logistic regression uses floats anyway
-    X = X.astype(float)
-
     seed = config.get("train", {}).get("random_state", 42)
     # train/test split
     X_train, X_test, y_train, y_test = train_test_split(
@@ -140,8 +138,8 @@ def run_training_pipeline(input_path: str, model_path: str):
         numeric_features = [col for col in numeric_features if col in X.columns]
 
         preprocessor = ColumnTransformer(
-            transformers=[("num", StandardScaler(), numeric_features)],
-            remainder="passthrough",  # don't touch other columns
+            transformers=[('num', StandardScaler(), numeric_features)],
+                remainder="passthrough"
         )
 
         # model selection
@@ -209,7 +207,8 @@ def run_training_pipeline(input_path: str, model_path: str):
 
         input_example = X_train.iloc[:5]
         signature = infer_signature(
-            input_example, model_pipeline.predict(input_example)
+            input_example.astype(float),
+            model_pipeline.predict(input_example)
         )
 
         # log model

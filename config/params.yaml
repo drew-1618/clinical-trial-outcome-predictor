@@ -8,7 +8,7 @@ ingestion:
 
 model:
   # CHANGE HERE to switch models easily
-  type: "logistic" # options: logistic, random_forest
+  type: "random_forest" # options: logistic, random_forest
 
   logistic:
     C: 1.0
