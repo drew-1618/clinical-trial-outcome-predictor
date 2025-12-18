@@ -5,3 +5,17 @@ ingestion:
   condition: "cancer"
   page_size: 100
   max_pages: 5
+
+model:
+  # CHANGE HERE to switch models easily
+  type: "logistic" # options: logistic, random_forest
+
+  logistic:
+    C: 1.0
+    solver: "liblinear"
+    max_iter: 1000
+
+  random_forest:
+    n_estimators: 100  # number of trees
+    max_depth: 10      # prevent over fitting
+    random_state: 42
