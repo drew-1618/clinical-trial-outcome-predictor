@@ -40,5 +40,5 @@ docker/*.log
 
 # Models
 models/
-
+mlflow.db
 mlruns/
